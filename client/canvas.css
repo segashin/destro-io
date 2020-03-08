@@ -1,0 +1,27 @@
+html,
+body{
+  margin: 0;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  background: rgb(0, 0, 0);
+}
+
+#canvasMain{
+    position: absolute;
+    background: #688A08;
+    display: block;
+}
+#canvasUi{
+    position: absolute;
+    display: block;
+}
+#infoDiv{
+    float: right;
+}
+#canvasInfo{
+    position: relative;
+    border-color: chartreuse;
+    display: block;
+    opacity : 0.8;
+}
