@@ -1,6 +1,7 @@
 module.exports = {
     player_size: 20,    //equals tile size
     bullet1_size: 1,
+    bot_size: 30,
     default_visible_width: 500,
     default_visible_height: 500,
     default_player_hp: 10,

@@ -118,6 +118,13 @@ var Game = function(){
     self.TileCoords2CanvasCoords = function(x,y){
         return self.getCanvasCoords(x*self.tileSize, y*self.tileSize);
     }
+    self.drawBot = function(bot){
+        let coordXY = self.getCanvasCoords(bot.x, bot.y)
+        self.ctx.fillStyle = "#0000FF";
+        self.ctx.beginPath();
+        self.ctx.arc(coordXY[0], coordXY[1], self.playerSize/2*self.scale, 0, 2 * Math.PI);
+        self.ctx.fill();
+    }
     //pass the absolute position on the game map
     self.drawPlayer = function(player){
         //find the displacement
@@ -135,8 +142,9 @@ var Game = function(){
         self.ctx.beginPath();
         self.ctx.arc(coordXY[0], coordXY[1], self.playerSize/4*self.scale, 0, 2 * Math.PI);
         self.ctx.fill();
-        self.ctx.fillStyle = "#FF0000";
-        self.ctx.fillRect(coordXY[0]-15*self.scale, coordXY[1]-(self.playerSize/2+6)*self.scale, player.hp/self.val.default_player_hp*30*self.scale, 2*self.scale)
+        //draw hp bar
+        self.ctx.fillStyle = "#FFAAAA";
+        self.ctx.fillRect(coordXY[0]-10*self.scale, coordXY[1]-(self.playerSize/2+6)*self.scale, player.hp/self.val.default_player_hp*20*self.scale, 2*self.scale)
     };
     //pass the absolute position on the game map
     self.drawBullet = function(x,y, spdX, spdY){
@@ -259,6 +267,7 @@ var Game = function(){
         for(let i in self.data.bullet){
             self.drawBullet(self.data.bullet[i].x, self.data.bullet[i].y, self.data.bullet[i].spdX, self.data.bullet[i].spdY);
         }
+        self.drawBot(self.data.bot)
         //draws all player
         for(let i in self.data.player){
             //self.drawPlayer(self.data.player[i].x, self.data.player[i].y);

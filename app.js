@@ -1,9 +1,9 @@
-var express = require('express');
-var app = express();
-var serv = require('http').Server(app);
-var io = require('socket.io')(serv, {});
-var val = require("./val.js");
-var mapdata = require("./mapdata.js");
+let express = require('express');
+let app = express();
+let serv = require('http').Server(app);
+let io = require('socket.io')(serv, {});
+let val = require("./val.js");
+let mapdata = require("./mapdata.js");
 app.get('/', function(req, res){
     res.sendFile(__dirname + '/client/index.html');
 });
@@ -13,7 +13,7 @@ console.log("Server started");
 
 SOCKET_LIST = {}
 GAME_LIST = {};
-var GAME_COUNT = 0;
+let GAME_COUNT = 0;
 //socket connection
 io.sockets.on('connection', function(socket){
     //TODO: support multiple game instances
@@ -32,14 +32,14 @@ io.sockets.on('connection', function(socket){
     //listens to dissconnect
 });
 
-var deleteGame = function(id){
+let deleteGame = function(id){
     delete GAME_LIST[id];
     GAME_COUNT -=1;
     console.log("Gamee instance deleted")
 }
 
 //game objects
-var Entity = function(){
+let Entity = function(){
     let self = {};
     self.x = 0;
     self.y = 0;
@@ -52,6 +52,7 @@ var Entity = function(){
     self.tileX = 0;
     self.tileY = 0;
     self.hp = 0;
+    self.size = 30;
     self.isAlive = true;
     self.getNeighborTiles = function(map){
         //- returns the 8 neighboring tiles around this entity
@@ -86,7 +87,128 @@ var Entity = function(){
     }
     return self;
 }
-var Bullet = function(game, player, angle, accuracy){
+let Creature = function(){
+    let self = new Entity();
+
+    self.adjustSpd4CollisionWithSquare = function(neighbor){
+        //- changes the spd to make it look as if the player collided with a plain surface
+        let allowedOverlap = 5;
+        let itile = neighbor;
+        let iL = itile.x*val.tile_size; // left edge x of itile
+        let iR = iL + val.tile_size;    // right edge x of itile
+        let iT = itile.y*val.tile_size; // top edge y of itile
+        let iB = iT + val.tile_size;    //  bottom edge y of itile
+        let ps = (self.size - allowedOverlap)/2;
+        let eX = self.x + self.spdX; // expected position x
+        let eY = self.y;
+        
+        if(eX+ps > iL && eX-ps < iR && eY+ps > iT && eY-ps < iB){
+            console.log("1")
+            self.spdX = 0;
+            self.collided = true;
+        }
+        eX = self.x; // expected position x
+        eY = self.y + self.spdY;
+        if(eX+ps > iL && eX-ps < iR && eY+ps > iT && eY-ps < iB){
+            console.log("2")
+            self.spdY = 0;
+            self.collided = true;
+        }
+    }
+    self.adjustSpd4CollisionWithQuarterCircle = function(neighbor){
+        //- sets the spd = 0
+        //- changes the position to make it look as if the player collided with a rounded surface
+        //only works from the rounded side
+        let itile = neighbor;
+        let allowedOverlap = 0;
+        let eX = self.x + self.spdX; // expected position x
+        let eY = self.y + self.spdY;
+        let ps = (self.size-allowedOverlap)/2;
+        let radiiSum = ps+(val.tile_size-allowedOverlap);
+        let dst = null;
+        let centerX = null;
+        let centerY = null;
+        if(neighbor.shape==1){
+            centerX = itile.x*val.tile_size;
+            centerY = (itile.y+1)*val.tile_size;
+        }else if(neighbor.shape==2){
+            centerX = (itile.x+1)*val.tile_size;
+            centerY = (itile.y+1)*val.tile_size;
+        }else if(neighbor.shape==3){
+            centerX = (itile.x+1)*val.tile_size;
+            centerY = (itile.y)*val.tile_size;
+        }else if(neighbor.shape==4){
+            centerX = (itile.x)*val.tile_size;
+            centerY = (itile.y)*val.tile_size;
+        }else{
+            console.log("Error: This tile has no shape");
+        }
+        let dstX = eX-centerX;
+        let dstY = eY-centerY;
+        dst = dstX*dstX + dstY*dstY;
+        if(radiiSum*radiiSum > dst){
+            self.x = centerX+(radiiSum)*(dstX/Math.sqrt(dst));
+            self.y = centerY+(radiiSum)*(dstY/Math.sqrt(dst));
+            self.spdX = 0;
+            self.spdY = 0;
+        }
+    }
+
+    self.adjustSpd4Collision = function(map){
+        //- get neigbor tiles and check if each of them is passsable
+        //- call apropriate adjustSpd ... Square or QuarterCircle
+
+        let neighbors = self.getNeighborTiles(map);
+
+        for(let i = 0; i < neighbors.length; i++){
+            if(neighbors[i] === null){
+                continue;
+            }else if(neighbors[i].passable){
+                continue;
+            }else{
+                if(neighbors[i].shape == 0 || neighbors[i].shape === null){
+                    self.adjustSpd4CollisionWithSquare(neighbors[i]);
+                }else{
+                    self.adjustSpd4CollisionWithQuarterCircle(neighbors[i]);
+                }
+            }
+        }
+    }
+    return self;
+}
+let Bot = function(team, path){
+    let self = new Creature();
+    self.x = 60;
+    self.y = 60;
+    self.tileX = Math.floor(self.x/val.tile_size);
+    self.tileY = Math.floor(self.y/val.tile_size);
+    self.team = team;
+    self.path = path;
+    self.spd = 2;
+    self.dstTileX = 8;
+    self.dstTileY = 50;
+    self.spdAngle = 0;
+    self.size = val.bot_size;
+    self.setSpdXY = function(){
+        self.spdAngle = Math.atan2(self.y-(self.dstTileY-0.5)*val.tile_size, self.x-(self.dstTileX-0.5)*val.tile_size);
+        self.spdX = -Math.cos(self.spdAngle)*self.spd;
+        self.spdY = -Math.sin(self.spdAngle)*self.spd;
+    }
+    self.update = function(map){
+        //reassign spdX and Y because they might be set 0 for collision handling
+        //collision player object
+        self.setSpdXY();
+        self.adjustSpd4Collision(map);
+        self.x += self.spdX;
+        self.y += self.spdY;
+
+        self.tileX = Math.floor(self.x/val.tile_size);
+        self.tileY = Math.floor(self.y/val.tile_size);
+    }
+    
+    return self;
+}
+let Bullet = function(game, player, angle, accuracy){
     let self = new Entity();
     //angle of the velocity of this bullet
     angle = angle - accuracy + Math.random()*accuracy*2;
@@ -125,7 +247,7 @@ var Bullet = function(game, player, angle, accuracy){
         //- decrease the collided player's hp if it's an enemy
         //- check the collisions with impassable tiles
         if(self.timer++ > self.lifetime){
-            self.toRemove = true;game;
+            self.toRemove = true;
         }else{
             //collision player vs bullet
             for(i in game.PLAYER_LIST){
@@ -164,8 +286,8 @@ var Bullet = function(game, player, angle, accuracy){
     game.BULLET_LIST[self.id] = self;
     return self;
 }
-var Player = function(game){
-    let self = new Entity();
+let Player = function(game){
+    let self = new Creature();
     self.hp = val.default_player_hp;
     self.spd = val.default_player_speed;
     //key (and mouse) state
@@ -184,12 +306,12 @@ var Player = function(game){
     self.attackCount = self.attackRate;
 
     //player's parameter
-    self.isAlive = true;
     self.exp = 0;
     self.team = 0; //x: 0, y: 1
 
     //player's parameter related to grphics
     self.playerSize = val.player_size;
+    self.size = val.player_size;
     self.x = 60;
     self.y = 60;
     self.visibleWidth = val.default_visible_width;
@@ -200,6 +322,19 @@ var Player = function(game){
     self.attack = function(){
         new Bullet(game,self,self.mouseAngle, 2)
         //console.log("attack")
+    }
+    self.assignSpd = function(){
+        //checks the keyStates and reassigns proper SpdX/Y
+        self.spdX = 0;
+        self.spdY = 0;
+        self.spdY += self.keyStates.W ? -self.spd : 0;
+        self.spdX += self.keyStates.A ? -self.spd : 0;
+        self.spdY += self.keyStates.S ? self.spd : 0;
+        self.spdX += self.keyStates.D ? self.spd : 0;
+        if(self.spdX!=0 && self.spdY!=0){
+            self.spdX /= Math.SQRT2;
+            self.spdY /= Math.SQRT2;
+        }   
     }
     
     self.incExp = function(type){
@@ -278,9 +413,7 @@ var Player = function(game){
     self.adjustSpd4Collision = function(map){
         //- get neigbor tiles and check if each of them is passsable
         //- call apropriate adjustSpd ... Square or QuarterCircle
-
         let neighbors = self.getNeighborTiles(map);
-
         for(let i = 0; i < neighbors.length; i++){
             if(neighbors[i] === null){
                 continue;
@@ -327,19 +460,7 @@ var Player = function(game){
             //self.spd = val.default_player_speed;
         }
     }
-    self.assignSpd = function(){
-        //checks the keyStates and reassigns proper SpdX/Y
-        self.spdX = 0;
-        self.spdY = 0;
-        self.spdY += self.keyStates.W ? -self.spd : 0;
-        self.spdX += self.keyStates.A ? -self.spd : 0;
-        self.spdY += self.keyStates.S ? self.spd : 0;
-        self.spdX += self.keyStates.D ? self.spd : 0;
-        if(self.spdX!=0 && self.spdY!=0){
-            self.spdX /= Math.SQRT2;
-            self.spdY /= Math.SQRT2;
-        }   
-    }
+    
     self.keyHandler = function(){
         //- called everytime key is pressed
         self.assignSpd();
@@ -358,16 +479,16 @@ var Player = function(game){
     };
     return self;
 }
-var Building = function(game, id){
-    self = Entity();
+let Building = function(game, id){
+    let self = Entity();
     for(let i in game.map.buildingList[id]){
         self[i] = game.map.buildingList[id][i];
     }
     game.BUILDING_LIST[id] = self;
     return self;
 }
-var Core = function(game, id){
-    self = Building(game, id)
+let Core = function(game, id){
+    let self = Building(game, id)
     self.update = function(){
         //--call the gameOver of team method if the core is dead
         if(!self.isAlive){
@@ -381,7 +502,7 @@ var Core = function(game, id){
     return self;
 }
 
-var Team = function(game, id){
+let Team = function(game, id){
     let self = {};
     self.teamId = id;
     if(id == 0){
@@ -400,7 +521,7 @@ var Team = function(game, id){
 }
 
 //game class
-var Game = function(id){
+let Game = function(id){
     let self = {};
     self.id = id;
     self.map = new mapdata.MapData1();
@@ -409,9 +530,11 @@ var Game = function(id){
     self.SOCKET_LIST = {};
     self.SOCKET_COUNT = 0;
     self.PLAYER_LIST = {};
+    self.BOT_LIST = {1:new Bot(0,0)};
     self.BULLET_LIST = {};
     self.BUILDING_COUNT = 0;
     self.BUILDING_LIST = {};
+
     
     self.TEAM_LIST = {};
     self.newData = {}
@@ -422,6 +545,7 @@ var Game = function(id){
     //init game values
     self.DEFAULT_PLAYER_HP = val.default_player_hp;
     self.DEFAULT_SERVER_FPS = val.default_server_fps;
+
 
     self.isGameOver = false;
     self.loser =null;
@@ -538,6 +662,7 @@ var Game = function(id){
         newData.bulletData = self.updateBullet();
         newData.teamData = self.updateTeam();
         newData.buildingData = self.updateBuilding();
+        self.BOT_LIST[1].update(self.map);
         return newData;
     }
     //socket is added
@@ -545,7 +670,7 @@ var Game = function(id){
         //-add the given socket to SOCKET_LIST
         //-create a player and initialize
         //-send initData
-        var player = new Player(self);
+        let player = new Player(self);
         self.SOCKET_LIST[socket.id] = socket;
         self.PLAYER_LIST[socket.id] = player;
         self.SOCKET_COUNT += 1;
@@ -592,13 +717,12 @@ var Game = function(id){
                 bullet: bulletDataVisible,
                 team: teamDataVisible,
                 building: buildingDataVisible,
+                bot: self.BOT_LIST[1],
             };
             //console.log(data.playerSelf);
             socket.emit('newData', data);
             //console.log('newData sent')
         }
     }, 1000/self.DEFAULT_SERVER_FPS);   
-
     return self;
-
 };

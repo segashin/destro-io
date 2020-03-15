@@ -1,9 +1,9 @@
 
 TO_DO
-team system
-core
+team system *3/6 done
+core *3/7 done
 tower
-soldiers
+bots
 skills
 return home
 mini_map
@@ -11,3 +11,5 @@ start_menu
 match making system
 
 
+
+3/9 Bot class basics done. TODO: Add BOT_LIST to Game class and modify the update loop.
