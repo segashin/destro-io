@@ -27,7 +27,6 @@ io.sockets.on('connection', function(socket){
     }
     SOCKET_LIST[socket.id] = socket;
     console.log(socket.id + " connected");
-    
     //console.log(self.map.OBJECT_TILE_ARRAY["2400"]);
     //listens to dissconnect
 });
@@ -56,7 +55,7 @@ let Entity = function(){
     self.isAlive = true;
     self.getNeighborTiles = function(map){
         //- returns the 8 neighboring tiles around this entity
-        let res = []
+        let res = [];
         res.push(map.getTile(self.tileX-1, self.tileY-1));
         res.push(map.getTile(self.tileX, self.tileY-1));
         res.push(map.getTile(self.tileX+1, self.tileY-1));
@@ -89,7 +88,6 @@ let Entity = function(){
 }
 let Creature = function(){
     let self = new Entity();
-
     self.adjustSpd4CollisionWithSquare = function(neighbor){
         //- changes the spd to make it look as if the player collided with a plain surface
         let allowedOverlap = 5;
@@ -103,14 +101,12 @@ let Creature = function(){
         let eY = self.y;
         
         if(eX+ps > iL && eX-ps < iR && eY+ps > iT && eY-ps < iB){
-            console.log("1")
             self.spdX = 0;
             self.collided = true;
         }
         eX = self.x; // expected position x
         eY = self.y + self.spdY;
         if(eX+ps > iL && eX-ps < iR && eY+ps > iT && eY-ps < iB){
-            console.log("2")
             self.spdY = 0;
             self.collided = true;
         }
@@ -178,15 +174,16 @@ let Creature = function(){
 }
 let Bot = function(team, path){
     let self = new Creature();
-    self.x = 60;
-    self.y = 60;
     self.tileX = Math.floor(self.x/val.tile_size);
     self.tileY = Math.floor(self.y/val.tile_size);
     self.team = team;
     self.path = path;
-    self.spd = 2;
-    self.dstTileX = 8;
-    self.dstTileY = 50;
+    self.spd = val.default_bot_speed;
+    self.dstTileX = self.path[0][0];
+    self.dstTileY = self.path[0][1];
+    self.path.shift();
+    self.x = (self.dstTileX-0.5)*val.tile_size;
+    self.y = (self.dstTileY-0.5)*val.tile_size;
     self.spdAngle = 0;
     self.size = val.bot_size;
     self.setSpdXY = function(){
@@ -194,9 +191,22 @@ let Bot = function(team, path){
         self.spdX = -Math.cos(self.spdAngle)*self.spd;
         self.spdY = -Math.sin(self.spdAngle)*self.spd;
     }
+    self.updateDst = function(){
+        let r = 30;
+        let a = self.x-(self.dstTileX-0.5)*val.tile_size;
+        let b = self.y-(self.dstTileY-0.5)*val.tile_size;
+        //if((a=(self.x-(self.dstTileX-0.5)*val.tile_size))*a+(b=((self.y-self.dstTileY-0.5)*val.tile_size))*b <(r*r)){
+        if(self.path.length>0){
+            if(a*a+b*b<r*r){
+                self.dstTileX = self.path[0][0];
+                self.dstTileY = self.path[0][1];
+                self.path.shift();
+            }
+        }
+    }
     self.update = function(map){
         //reassign spdX and Y because they might be set 0 for collision handling
-        //collision player object
+        self.updateDst();
         self.setSpdXY();
         self.adjustSpd4Collision(map);
         self.x += self.spdX;
@@ -205,7 +215,6 @@ let Bot = function(team, path){
         self.tileX = Math.floor(self.x/val.tile_size);
         self.tileY = Math.floor(self.y/val.tile_size);
     }
-    
     return self;
 }
 let Bullet = function(game, player, angle, accuracy){
@@ -232,15 +241,12 @@ let Bullet = function(game, player, angle, accuracy){
     self.timer = 0;
     //the age at which this bullet should be removed
     self.lifetime = 7;
-
-
     self.isCollidedWithPlayer = function(player){
-        if(player.getDistanceSquared(self)<(a=player.playerSize/2)*a){
-            return true
+        if(player.getDistanceSquared(self)<(a=player.size/2)*a){
+            return true;
         }
-        return false
+        return false;
     }
-
     self.update = function(game){
         //- check the lifetime to set toRemove
         //- check the collision with players
@@ -281,7 +287,6 @@ let Bullet = function(game, player, angle, accuracy){
             self.y += self.spdY;
         }
     };
-
     self.id = game.generateBulletId();
     game.BULLET_LIST[self.id] = self;
     return self;
@@ -310,7 +315,6 @@ let Player = function(game){
     self.team = 0; //x: 0, y: 1
 
     //player's parameter related to grphics
-    self.playerSize = val.player_size;
     self.size = val.player_size;
     self.x = 60;
     self.y = 60;
@@ -348,86 +352,6 @@ let Player = function(game){
         }
     }
     
-    self.adjustSpd4CollisionWithSquare = function(neighbor){
-        //- changes the spd to make it look as if the player collided with a plain surface
-        let allowedOverlap = 5;
-        let itile = neighbor;
-        let iL = itile.x*val.tile_size; // left edge x of itile
-        let iR = iL + val.tile_size;    // right edge x of itile
-        let iT = itile.y*val.tile_size; // top edge y of itile
-        let iB = iT + val.tile_size;    //  bottom edge y of itile
-        let ps = (self.playerSize - allowedOverlap)/2;
-        let eX = self.x + self.spdX; // expected position x
-        let eY = self.y;
-        
-        if(eX+ps > iL && eX-ps < iR && eY+ps > iT && eY-ps < iB){
-            self.spdX = 0;
-            self.collided = true;
-        }
-        eX = self.x; // expected position x
-        eY = self.y + self.spdY;
-        if(eX+ps > iL && eX-ps < iR && eY+ps > iT && eY-ps < iB){
-            self.spdY = 0;
-            self.collided = true;
-        }
-    }
-    self.adjustSpd4CollisionWithQuarterCircle = function(neighbor){
-        //- sets the spd = 0
-        //- changes the position to make it look as if the player collided with a rounded surface
-        //only works from the rounded side
-        let itile = neighbor;
-        let allowedOverlap = 0;
-        let eX = self.x + self.spdX; // expected position x
-        let eY = self.y + self.spdY;
-        let ps = (self.playerSize-allowedOverlap)/2;
-        let radiiSum = ps+(val.tile_size-allowedOverlap);
-        let dst = null;
-        let centerX = null;
-        let centerY = null;
-        if(neighbor.shape==1){
-            centerX = itile.x*val.tile_size;
-            centerY = (itile.y+1)*val.tile_size;
-        }else if(neighbor.shape==2){
-            centerX = (itile.x+1)*val.tile_size;
-            centerY = (itile.y+1)*val.tile_size;
-        }else if(neighbor.shape==3){
-            centerX = (itile.x+1)*val.tile_size;
-            centerY = (itile.y)*val.tile_size;
-        }else if(neighbor.shape==4){
-            centerX = (itile.x)*val.tile_size;
-            centerY = (itile.y)*val.tile_size;
-        }else{
-            console.log("Error: This tile has no shape");
-        }
-        let dstX = eX-centerX;
-        let dstY = eY-centerY;
-        dst = dstX*dstX + dstY*dstY;
-        if(radiiSum*radiiSum > dst){
-            self.x = centerX+(radiiSum)*(dstX/Math.sqrt(dst));
-            self.y = centerY+(radiiSum)*(dstY/Math.sqrt(dst));
-            self.spdX = 0;
-            self.spdY = 0;
-        }
-    }
-
-    self.adjustSpd4Collision = function(map){
-        //- get neigbor tiles and check if each of them is passsable
-        //- call apropriate adjustSpd ... Square or QuarterCircle
-        let neighbors = self.getNeighborTiles(map);
-        for(let i = 0; i < neighbors.length; i++){
-            if(neighbors[i] === null){
-                continue;
-            }else if(neighbors[i].passable){
-                continue;
-            }else{
-                if(neighbors[i].shape == 0 || neighbors[i].shape === null){
-                    self.adjustSpd4CollisionWithSquare(neighbors[i]);
-                }else{
-                    self.adjustSpd4CollisionWithQuarterCircle(neighbors[i]);
-                }
-            }
-        }
-    }
     self.update = function(map){
         //- changing the spdX and spedY depending on te keyinputs
         //- changing the position according to the spd
@@ -530,12 +454,13 @@ let Game = function(id){
     self.SOCKET_LIST = {};
     self.SOCKET_COUNT = 0;
     self.PLAYER_LIST = {};
-    self.BOT_LIST = {1:new Bot(0,0)};
+    self.BOT_LIST = {};
+    self.BOT_COUNT = 0;
     self.BULLET_LIST = {};
     self.BUILDING_COUNT = 0;
     self.BUILDING_LIST = {};
 
-    
+    self.botGenTimeList = [];
     self.TEAM_LIST = {};
     self.newData = {}
     //generate map
@@ -546,9 +471,18 @@ let Game = function(id){
     self.DEFAULT_PLAYER_HP = val.default_player_hp;
     self.DEFAULT_SERVER_FPS = val.default_server_fps;
 
-
     self.isGameOver = false;
     self.loser =null;
+
+    self.init = function(){
+        //set the time to generate bots
+        self.botGenTimeList = [];
+        let curtime = 0;
+        while(curtime+val.bot_gen_interval<val.game_time_max){
+            self.botGenTimeList.push(curtime);
+            curtime += val.bot_gen_interval;
+        }
+    }
     
     self.assignTeam = function(player){
         if(self.SOCKET_COUNT%2 == 1){
@@ -556,13 +490,16 @@ let Game = function(id){
         }else{
             player.team = 1 //y
         }
+        
     }
-    
     self.generateBulletId = function(){
         self.BULLET_COUNT += 1;
         return self.BULLET_COUNT;
     }
-    
+    self.generateBotId = function(){
+        self.BOT_COUNT += 1;
+        return self.BOT_COUNT;
+    }
     self.gameOver = function(teamId){
         self.loser = teamId;
         self.gameOver = true;
@@ -570,7 +507,22 @@ let Game = function(id){
     self.decreaseHp = function(entity, damage){
         entity.decreaseHp(damage);
     }
-    
+    self.generateBots = function(){
+        for(let i=0; i<5; i++){
+            let bot00 = new Bot(0,val.team_0_bot_path_0.concat());
+            let bot10 = new Bot(1,val.team_0_bot_path_0.concat().reverse());
+            let bot01 = new Bot(0,val.team_0_bot_path_1.concat());
+            let bot11 = new Bot(1,val.team_0_bot_path_1.concat().reverse());
+            let bot02 = new Bot(0,val.team_0_bot_path_2.concat());
+            let bot12 = new Bot(1,val.team_0_bot_path_2.concat().reverse());
+            self.BOT_LIST[this.generateBotId()] = bot00;
+            self.BOT_LIST[this.generateBotId()] = bot01;
+            self.BOT_LIST[this.generateBotId()] = bot02;
+            self.BOT_LIST[this.generateBotId()] = bot10;
+            self.BOT_LIST[this.generateBotId()] = bot11;
+            self.BOT_LIST[this.generateBotId()] = bot12;
+        }
+    } 
     self.updatePlayer = function(){
         let playerData = [];
         for(let i in self.PLAYER_LIST){
@@ -622,6 +574,24 @@ let Game = function(id){
         }
         return buildingData;
     }
+    self.updateBot = function(){
+        let botData = [];
+        for(let i in self.BOT_LIST){
+            let bot = self.BOT_LIST[i];
+            bot.update(self.map);
+            if(bot.toRemove){
+                delete self.BOT_LIST[i];
+            }else{
+                botData.push({
+                    x:bot.x,
+                    y:bot.y,
+                    team:bot.team,
+                    hp:bot.hp,
+                });
+            }
+        }
+        return botData;
+    }
     self.getVisiblePlayers = function(playerSelf, playerData){
         let playerDataVisible = [];
         for(let i = 0; i < playerData.length; i++){
@@ -642,6 +612,16 @@ let Game = function(id){
         }
         return bulletDataVisible;
     }
+    self.getVisibleBots = function(playerSelf, botData){
+        let botDataVisible = [];
+        for(let i=0; i<botData.length;i++){
+            bot = botData[i];
+            if(Math.abs(bot.x-playerSelf.x) < val.default_visible_width/2+50 && Math.abs(bot.y-playerSelf.y) < val.default_visible_height/2+50){
+                botDataVisible.push(bot);
+            }
+        }
+        return botDataVisible;
+    }
     self.getVisibleTeam = function(playerSelf, teamData){
         return teamData[playerSelf.team];
     }
@@ -654,7 +634,9 @@ let Game = function(id){
         return {bullets:self.getVisibleBullets(playerSelf, newData.bulletData),
                 players:self.getVisiblePlayers(playerSelf, newData.playerData),
                 team:self.getVisibleTeam(playerSelf, newData.teamData),
-                buildings:self.getVisibleBuildings(playerSelf,newData.buildingData)};
+                buildings:self.getVisibleBuildings(playerSelf,newData.buildingData),
+                bots:self.getVisibleBots(playerSelf, newData.botData),
+            };
     }
     self.update = function(){
         let newData = {};
@@ -662,7 +644,7 @@ let Game = function(id){
         newData.bulletData = self.updateBullet();
         newData.teamData = self.updateTeam();
         newData.buildingData = self.updateBuilding();
-        self.BOT_LIST[1].update(self.map);
+        newData.botData = self.updateBot();
         return newData;
     }
     //socket is added
@@ -684,7 +666,6 @@ let Game = function(id){
             val: val,
             buildingList: self.map.buildingList,
         });
-
         socket.on('disconnect', function(){
             delete self.SOCKET_LIST[socket.id];
             delete self.PLAYER_LIST[socket.id]
@@ -696,9 +677,19 @@ let Game = function(id){
             }
         });
     }
+
     //game loop
+    self.startTime = Date.now();
+    self.timeElapsed = 0;
+    self.init();
+    let botGenCount = 0;
     setInterval(function(){
         self.newData = self.update();
+        self.timeElapsed = Date.now() - self.startTime;
+        if(self.botGenTimeList[0]<self.timeElapsed){
+            self.generateBots();
+            self.botGenTimeList.shift();
+        }
         for(let i in self.SOCKET_LIST){
             let socket = self.SOCKET_LIST[i];
             let player = self.PLAYER_LIST[socket.id];
@@ -708,6 +699,7 @@ let Game = function(id){
             let playerDataVisible = visibleComponents.players;
             let teamDataVisible = visibleComponents.team;
             let buildingDataVisible = visibleComponents.buildings;
+            let botDataVisible = visibleComponents.bots;
             let data = {
                 playerSelf: {
                     x:player.x,
@@ -717,7 +709,7 @@ let Game = function(id){
                 bullet: bulletDataVisible,
                 team: teamDataVisible,
                 building: buildingDataVisible,
-                bot: self.BOT_LIST[1],
+                bot: botDataVisible,
             };
             //console.log(data.playerSelf);
             socket.emit('newData', data);

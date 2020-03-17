@@ -1220,28 +1220,28 @@
     "549": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 2,
         "x": 49,
         "y": 5
     },
     "550": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 1,
         "x": 50,
         "y": 5
     },
     "572": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 2,
         "x": 72,
         "y": 5
     },
     "573": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 1,
         "x": 73,
         "y": 5
     },
@@ -1343,7 +1343,7 @@
     "616": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 2,
         "x": 16,
         "y": 6
     },
@@ -1357,7 +1357,7 @@
     "618": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 1,
         "x": 18,
         "y": 6
     },
@@ -1378,28 +1378,28 @@
     "649": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 3,
         "x": 49,
         "y": 6
     },
     "650": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 4,
         "x": 50,
         "y": 6
     },
     "672": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 3,
         "x": 72,
         "y": 6
     },
     "673": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 4,
         "x": 73,
         "y": 6
     },
@@ -1617,7 +1617,7 @@
     "816": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 3,
         "x": 16,
         "y": 8
     },
@@ -1631,7 +1631,7 @@
     "818": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 4,
         "x": 18,
         "y": 8
     },
@@ -2010,34 +2010,6 @@
         "x": 52,
         "y": 11
     },
-    "1153": {
-        "type": "wall",
-        "passable": false,
-        "shape": 0,
-        "x": 53,
-        "y": 11
-    },
-    "1154": {
-        "type": "wall",
-        "passable": false,
-        "shape": 0,
-        "x": 54,
-        "y": 11
-    },
-    "1155": {
-        "type": "wall",
-        "passable": false,
-        "shape": 0,
-        "x": 55,
-        "y": 11
-    },
-    "1156": {
-        "type": "wall",
-        "passable": false,
-        "shape": 0,
-        "x": 56,
-        "y": 11
-    },
     "1157": {
         "type": "wall",
         "passable": false,
@@ -2402,27 +2374,6 @@
         "x": 53,
         "y": 12
     },
-    "1254": {
-        "type": "wall",
-        "passable": false,
-        "shape": 0,
-        "x": 54,
-        "y": 12
-    },
-    "1255": {
-        "type": "wall",
-        "passable": false,
-        "shape": 0,
-        "x": 55,
-        "y": 12
-    },
-    "1256": {
-        "type": "wall",
-        "passable": false,
-        "shape": 0,
-        "x": 56,
-        "y": 12
-    },
     "1257": {
         "type": "wall",
         "passable": false,
@@ -2785,41 +2736,6 @@
         "passable": false,
         "shape": 0,
         "x": 52,
-        "y": 13
-    },
-    "1353": {
-        "type": "wall",
-        "passable": false,
-        "shape": 0,
-        "x": 53,
-        "y": 13
-    },
-    "1354": {
-        "type": "wall",
-        "passable": false,
-        "shape": 0,
-        "x": 54,
-        "y": 13
-    },
-    "1355": {
-        "type": "wall",
-        "passable": false,
-        "shape": 0,
-        "x": 55,
-        "y": 13
-    },
-    "1356": {
-        "type": "wall",
-        "passable": false,
-        "shape": 0,
-        "x": 56,
-        "y": 13
-    },
-    "1357": {
-        "type": "wall",
-        "passable": false,
-        "shape": 0,
-        "x": 57,
         "y": 13
     },
     "1358": {
@@ -3511,7 +3427,7 @@
     "1706": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 2,
         "x": 6,
         "y": 17
     },
@@ -3525,7 +3441,7 @@
     "1708": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 1,
         "x": 8,
         "y": 17
     },
@@ -3917,7 +3833,7 @@
     "1906": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 3,
         "x": 6,
         "y": 19
     },
@@ -3931,7 +3847,7 @@
     "1908": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 4,
         "x": 8,
         "y": 19
     },
@@ -6220,14 +6136,14 @@
     "2693": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 2,
         "x": 93,
         "y": 26
     },
     "2694": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 1,
         "x": 94,
         "y": 26
     },
@@ -6311,14 +6227,14 @@
     "2728": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 2,
         "x": 28,
         "y": 27
     },
     "2729": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 1,
         "x": 29,
         "y": 27
     },
@@ -6549,14 +6465,14 @@
     "2793": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 3,
         "x": 93,
         "y": 27
     },
     "2794": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 4,
         "x": 94,
         "y": 27
     },
@@ -6640,14 +6556,14 @@
     "2828": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 3,
         "x": 28,
         "y": 28
     },
     "2829": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 4,
         "x": 29,
         "y": 28
     },
@@ -9755,14 +9671,14 @@
     "3940": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 2,
         "x": 40,
         "y": 39
     },
     "3941": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 1,
         "x": 41,
         "y": 39
     },
@@ -10028,14 +9944,14 @@
     "4040": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 3,
         "x": 40,
         "y": 40
     },
     "4041": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 4,
         "x": 41,
         "y": 40
     },
@@ -12072,14 +11988,14 @@
     "4905": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 2,
         "x": 5,
         "y": 49
     },
     "4906": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 1,
         "x": 6,
         "y": 49
     },
@@ -12324,14 +12240,14 @@
     "4993": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 2,
         "x": 93,
         "y": 49
     },
     "4994": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 1,
         "x": 94,
         "y": 49
     },
@@ -12352,14 +12268,14 @@
     "5005": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 3,
         "x": 5,
         "y": 50
     },
     "5006": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 4,
         "x": 6,
         "y": 50
     },
@@ -12604,14 +12520,14 @@
     "5093": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 3,
         "x": 93,
         "y": 50
     },
     "5094": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 4,
         "x": 94,
         "y": 50
     },
@@ -14648,14 +14564,14 @@
     "5958": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 2,
         "x": 58,
         "y": 59
     },
     "5959": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 1,
         "x": 59,
         "y": 59
     },
@@ -14921,14 +14837,14 @@
     "6058": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 3,
         "x": 58,
         "y": 60
     },
     "6059": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 4,
         "x": 59,
         "y": 60
     },
@@ -18036,14 +17952,14 @@
     "7170": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 2,
         "x": 70,
         "y": 71
     },
     "7171": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 1,
         "x": 71,
         "y": 71
     },
@@ -18127,14 +18043,14 @@
     "7205": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 2,
         "x": 5,
         "y": 72
     },
     "7206": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 1,
         "x": 6,
         "y": 72
     },
@@ -18365,14 +18281,14 @@
     "7270": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 3,
         "x": 70,
         "y": 72
     },
     "7271": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 4,
         "x": 71,
         "y": 72
     },
@@ -18456,14 +18372,14 @@
     "7305": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 3,
         "x": 5,
         "y": 73
     },
     "7306": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 4,
         "x": 6,
         "y": 73
     },
@@ -20497,27 +20413,6 @@
         "x": 79,
         "y": 79
     },
-    "7991": {
-        "type": "wall",
-        "passable": false,
-        "shape": 2,
-        "x": 91,
-        "y": 79
-    },
-    "7992": {
-        "type": "wall",
-        "passable": false,
-        "shape": 0,
-        "x": 92,
-        "y": 79
-    },
-    "7993": {
-        "type": "wall",
-        "passable": false,
-        "shape": 1,
-        "x": 93,
-        "y": 79
-    },
     "7999": {
         "type": "wall",
         "passable": false,
@@ -20773,7 +20668,7 @@
     "8091": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 2,
         "x": 91,
         "y": 80
     },
@@ -20787,7 +20682,7 @@
     "8093": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 1,
         "x": 93,
         "y": 80
     },
@@ -21018,7 +20913,7 @@
     "8191": {
         "type": "wall",
         "passable": false,
-        "shape": 3,
+        "shape": 0,
         "x": 91,
         "y": 81
     },
@@ -21032,7 +20927,7 @@
     "8193": {
         "type": "wall",
         "passable": false,
-        "shape": 4,
+        "shape": 0,
         "x": 93,
         "y": 81
     },
@@ -21181,6 +21076,27 @@
         "passable": true,
         "shape": 0,
         "x": 82,
+        "y": 82
+    },
+    "8291": {
+        "type": "wall",
+        "passable": false,
+        "shape": 3,
+        "x": 91,
+        "y": 82
+    },
+    "8292": {
+        "type": "wall",
+        "passable": false,
+        "shape": 0,
+        "x": 92,
+        "y": 82
+    },
+    "8293": {
+        "type": "wall",
+        "passable": false,
+        "shape": 4,
+        "x": 93,
         "y": 82
     },
     "8299": {
@@ -21876,41 +21792,6 @@
         "x": 41,
         "y": 86
     },
-    "8642": {
-        "type": "wall",
-        "passable": false,
-        "shape": 0,
-        "x": 42,
-        "y": 86
-    },
-    "8643": {
-        "type": "wall",
-        "passable": false,
-        "shape": 0,
-        "x": 43,
-        "y": 86
-    },
-    "8644": {
-        "type": "wall",
-        "passable": false,
-        "shape": 0,
-        "x": 44,
-        "y": 86
-    },
-    "8645": {
-        "type": "wall",
-        "passable": false,
-        "shape": 0,
-        "x": 45,
-        "y": 86
-    },
-    "8646": {
-        "type": "wall",
-        "passable": false,
-        "shape": 0,
-        "x": 46,
-        "y": 86
-    },
     "8647": {
         "type": "wall",
         "passable": false,
@@ -22273,27 +22154,6 @@
         "passable": false,
         "shape": 0,
         "x": 42,
-        "y": 87
-    },
-    "8743": {
-        "type": "wall",
-        "passable": false,
-        "shape": 0,
-        "x": 43,
-        "y": 87
-    },
-    "8744": {
-        "type": "wall",
-        "passable": false,
-        "shape": 0,
-        "x": 44,
-        "y": 87
-    },
-    "8745": {
-        "type": "wall",
-        "passable": false,
-        "shape": 0,
-        "x": 45,
         "y": 87
     },
     "8746": {
@@ -22665,34 +22525,6 @@
         "passable": false,
         "shape": 0,
         "x": 42,
-        "y": 88
-    },
-    "8843": {
-        "type": "wall",
-        "passable": false,
-        "shape": 0,
-        "x": 43,
-        "y": 88
-    },
-    "8844": {
-        "type": "wall",
-        "passable": false,
-        "shape": 0,
-        "x": 44,
-        "y": 88
-    },
-    "8845": {
-        "type": "wall",
-        "passable": false,
-        "shape": 0,
-        "x": 45,
-        "y": 88
-    },
-    "8846": {
-        "type": "wall",
-        "passable": false,
-        "shape": 0,
-        "x": 46,
         "y": 88
     },
     "8847": {
@@ -23070,25 +22902,25 @@
         "x": 8,
         "y": 91
     },
-    "9179": {
-        "type": "wall",
-        "passable": false,
-        "shape": 2,
-        "x": 79,
-        "y": 91
-    },
     "9180": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 2,
         "x": 80,
         "y": 91
     },
     "9181": {
         "type": "wall",
         "passable": false,
-        "shape": 1,
+        "shape": 0,
         "x": 81,
+        "y": 91
+    },
+    "9182": {
+        "type": "wall",
+        "passable": false,
+        "shape": 1,
+        "x": 82,
         "y": 91
     },
     "9190": {
@@ -23193,13 +23025,6 @@
         "x": 75,
         "y": 92
     },
-    "9279": {
-        "type": "wall",
-        "passable": false,
-        "shape": 0,
-        "x": 79,
-        "y": 92
-    },
     "9280": {
         "type": "wall",
         "passable": false,
@@ -23212,6 +23037,13 @@
         "passable": false,
         "shape": 0,
         "x": 81,
+        "y": 92
+    },
+    "9282": {
+        "type": "wall",
+        "passable": false,
+        "shape": 0,
+        "x": 82,
         "y": 92
     },
     "9290": {
@@ -23305,28 +23137,28 @@
     "9326": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 2,
         "x": 26,
         "y": 93
     },
     "9327": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 1,
         "x": 27,
         "y": 93
     },
     "9349": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 2,
         "x": 49,
         "y": 93
     },
     "9350": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 1,
         "x": 50,
         "y": 93
     },
@@ -23344,25 +23176,25 @@
         "x": 75,
         "y": 93
     },
-    "9379": {
-        "type": "wall",
-        "passable": false,
-        "shape": 3,
-        "x": 79,
-        "y": 93
-    },
     "9380": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 3,
         "x": 80,
         "y": 93
     },
     "9381": {
         "type": "wall",
         "passable": false,
-        "shape": 4,
+        "shape": 0,
         "x": 81,
+        "y": 93
+    },
+    "9382": {
+        "type": "wall",
+        "passable": false,
+        "shape": 4,
+        "x": 82,
         "y": 93
     },
     "9390": {
@@ -23463,28 +23295,28 @@
     "9426": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 3,
         "x": 26,
         "y": 94
     },
     "9427": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 4,
         "x": 27,
         "y": 94
     },
     "9449": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 3,
         "x": 49,
         "y": 94
     },
     "9450": {
         "type": "wall",
         "passable": false,
-        "shape": 0,
+        "shape": 4,
         "x": 50,
         "y": 94
     },

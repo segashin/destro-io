@@ -120,9 +120,13 @@ var Game = function(){
     }
     self.drawBot = function(bot){
         let coordXY = self.getCanvasCoords(bot.x, bot.y)
-        self.ctx.fillStyle = "#0000FF";
+        if(bot.team == 0){
+            self.ctx.fillStyle = "#FF0000";
+        }else if(bot.team==1){
+            self.ctx.fillStyle = "#0000FF";
+        }
         self.ctx.beginPath();
-        self.ctx.arc(coordXY[0], coordXY[1], self.playerSize/2*self.scale, 0, 2 * Math.PI);
+        self.ctx.arc(coordXY[0], coordXY[1], self.val.bot_size/2*self.scale, 0, 2 * Math.PI);
         self.ctx.fill();
     }
     //pass the absolute position on the game map
@@ -148,7 +152,6 @@ var Game = function(){
     };
     //pass the absolute position on the game map
     self.drawBullet = function(x,y, spdX, spdY){
-        self.ctx.fillStyle = "black";
         let coordXY = self.getCanvasCoords(x, y);
         self.ctx.strokeStyle = "black";
         self.ctx.lineWidth = 2;
@@ -267,7 +270,7 @@ var Game = function(){
         for(let i in self.data.bullet){
             self.drawBullet(self.data.bullet[i].x, self.data.bullet[i].y, self.data.bullet[i].spdX, self.data.bullet[i].spdY);
         }
-        self.drawBot(self.data.bot)
+        
         //draws all player
         for(let i in self.data.player){
             //self.drawPlayer(self.data.player[i].x, self.data.player[i].y);
@@ -275,6 +278,9 @@ var Game = function(){
         }
         self.drawMapObjects();
         self.drawBuildings();
+        for(let i in self.data.bot){
+            self.drawBot(self.data.bot[i]);
+        }
         self.drawUi();
     }
     self.startGameLoop = function(){

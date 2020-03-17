@@ -4,7 +4,6 @@ import pandas as pd
 import json
 import collections as cl
 
-#%%
 def convert2csv(in_fname, out_fname):
     filepath = os.path.join(os.getcwd(), in_fname)
     out_path = os.path.join(os.getcwd(), out_fname)
