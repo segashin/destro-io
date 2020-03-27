@@ -13,3 +13,5 @@ match making system
 
 
 3/9 Bot class basics done. TODO: Add BOT_LIST to Game class and modify the update loop.
+3/23 Bot stops and attacks. But Bot doesn't get hurt yet.
+

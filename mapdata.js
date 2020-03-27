@@ -80,6 +80,16 @@ module.exports = {
                 maxHp:val.default_core_hp,
             }
         }
+        self.towerList = {
+            "tower00":{
+                x:18*val.tile_size,
+                y:18*val.tile_size,
+                type:"tower",
+                team: 0,
+                hp:val.default_tower_hp,
+                maxHp: val.default_tower_hp,
+            }
+        }
         return self;
     },
 }

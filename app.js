@@ -172,24 +172,54 @@ let Creature = function(){
     }
     return self;
 }
-let Bot = function(team, path){
+let Bot = function(game, team, path, type, id){
     let self = new Creature();
+    self.id = id;
+    self.hp = val.default_bot_hp;
     self.tileX = Math.floor(self.x/val.tile_size);
     self.tileY = Math.floor(self.y/val.tile_size);
     self.team = team;
     self.path = path;
     self.spd = val.default_bot_speed;
+    self.x = (self.path[0][0]-0.5)*val.tile_size;
+    self.y = (self.path[0][1]-0.5)*val.tile_size;
+    self.path.shift();
     self.dstTileX = self.path[0][0];
     self.dstTileY = self.path[0][1];
     self.path.shift();
-    self.x = (self.dstTileX-0.5)*val.tile_size;
-    self.y = (self.dstTileY-0.5)*val.tile_size;
     self.spdAngle = 0;
+    self.engagemetDst = val.bot_engage_dst+type*val.dst_bet_bot;
     self.size = val.bot_size;
-    self.setSpdXY = function(){
+    self.type = type;
+    self.target = null;
+    self.game = game;
+    self.attackCount = 0;
+    self.attackRate = val.bot_attack_rate;
+    self.setSpd4TileDst = function(){
         self.spdAngle = Math.atan2(self.y-(self.dstTileY-0.5)*val.tile_size, self.x-(self.dstTileX-0.5)*val.tile_size);
         self.spdX = -Math.cos(self.spdAngle)*self.spd;
         self.spdY = -Math.sin(self.spdAngle)*self.spd;
+    }
+    self.setSpd4TargetDst = function(){
+        let r = val.bot_attack_range+self.type*val.dst_bet_bot;
+        let a = self.x - self.target.x;
+        let b = self.y - self.target.y;
+        if(a*a+b*b>r*r){
+            self.spdAngle = Math.atan2(self.y-self.target.y, self.x-self.target.x);
+            self.spdX = -Math.cos(self.spdAngle)*self.spd;
+            self.spdY = -Math.sin(self.spdAngle)*self.spd;
+        }else{
+            let tangle = Math.atan2(self.target.y-self.y, self.target.x-self.x)/Math.PI*180;
+            if(self.attackCount >= self.attackRate){
+                self.attack(tangle);
+                self.attackCount = 0;
+            }else{
+                self.attackCount += 1;
+            }
+            self.spdX = 0;
+            self.spdY = 0;
+            self.target = null;
+        }
     }
     self.updateDst = function(){
         let r = 30;
@@ -204,10 +234,23 @@ let Bot = function(team, path){
             }
         }
     }
+    self.attack = function(angle){
+        new Bullet(self.game, self, angle, 2)
+        //console.log("attack")
+    }
     self.update = function(map){
+        if(self.hp<=0){
+            self.toRemove = true;
+            return
+        }
         //reassign spdX and Y because they might be set 0 for collision handling
         self.updateDst();
-        self.setSpdXY();
+        //console.log(self.target);
+        if(self.target === null){
+            self.setSpd4TileDst();
+        }else{
+            self.setSpd4TargetDst();
+        }
         self.adjustSpd4Collision(map);
         self.x += self.spdX;
         self.y += self.spdY;
@@ -217,32 +260,39 @@ let Bot = function(team, path){
     }
     return self;
 }
-let Bullet = function(game, player, angle, accuracy){
+let Bullet = function(game, owner, angle, accuracy){
     let self = new Entity();
     //angle of the velocity of this bullet
     angle = angle - accuracy + Math.random()*accuracy*2;
     self.spd = val.default_bullet_speed;
     //player object who generated this object
-    self.owner = player;
+    self.owner = owner;
+    self.team = owner.team;
     self.spdX = Math.cos(angle/180*Math.PI) * self.spd;
     self.spdY = Math.sin(angle/180*Math.PI) * self.spd;
     //the damage given to the colliding player
     self.damage = 1;
     //position of this bullet. The initial position is the position of the owner
-    self.x = player.x;
-    self.y = player.y;
+    self.x = owner.x;
+    self.y = owner.y;
     //whether this bullet should disappear
     self.toRemove = false;
     //the position of the player when this bullet was shot
     self.origin = {};
-    self.origin.x = player.x;
-    self.origin.y = player.y;
+    self.origin.x = owner.x;
+    self.origin.y = owner.y;
     //the age of this bullet
     self.timer = 0;
     //the age at which this bullet should be removed
     self.lifetime = 7;
     self.isCollidedWithPlayer = function(player){
-        if(player.getDistanceSquared(self)<(a=player.size/2)*a){
+        if(player.getDistanceSquared(self)<(a=player.size/2+val.bullet_size)*a){
+            return true;
+        }
+        return false;
+    }
+    self.isCollidedWithBot = function(bot){
+        if(self.getDistanceSquared(bot)<(a=bot.size/2+val.bullet_size)*a){
             return true;
         }
         return false;
@@ -256,8 +306,8 @@ let Bullet = function(game, player, angle, accuracy){
             self.toRemove = true;
         }else{
             //collision player vs bullet
-            for(i in game.PLAYER_LIST){
-                //TODO make the belwo if a function for better readability
+            for(let i in game.PLAYER_LIST){
+                //TODO make the below if block a function for better readability
                 //if(PLAYER_LIST[i].getDistanceSquared(self) < (a=PLAYER_LIST[i].playerSize/2)*a && !(PLAYER_LIST[i]===self.owner)){
                 //check that the bullet is collided with a player that is not yourself
                 if(self.isCollidedWithPlayer(game.PLAYER_LIST[i]) && !(game.PLAYER_LIST[i]===self.owner)){
@@ -267,8 +317,26 @@ let Bullet = function(game, player, angle, accuracy){
                         game.decreaseHp(game.PLAYER_LIST[i], self.damage);
                     }
                     self.toRemove = true;
+                    return
                 }
             }
+            //collision bot vs bullet
+            let opponentTeam = 0;
+            if(self.team==0){
+                opponentTeam = 1;
+            }
+            for(let i in game.BOT_TEAMS[opponentTeam]){
+                if(self.isCollidedWithBot(game.BOT_TEAMS[opponentTeam][i])){
+                    game.decreaseHp(game.BOT_TEAMS[opponentTeam][i], self.damage);
+                    self.toRemove = true;
+                }
+            }
+            //for(let i=0; i<game.BOT_TEAMS[opponentTeam].length; i++){
+            //    if(self.isCollidedWithBot(game.BOT_TEAMS[opponentTeam][i])){
+            //        game.decreaseHp(game.BOT_TEAMS[opponentTeam][i]);
+            //        self.toRemove = true;
+            //    }
+            //}
         }
         let dstTileX = Math.floor((self.x+self.spdX)/game.map.tileSize);
         let dstTileY = Math.floor((self.y+self.spdY)/game.map.tileSize);
@@ -307,7 +375,7 @@ let Player = function(game){
     
     //whether this player can attack now or not
     self.attackTF = false;
-    self.attackRate = 30; // bigger number for less bullets per second
+    self.attackRate = val.player_attack_rate; // bigger number for less bullets per second
     self.attackCount = self.attackRate;
 
     //player's parameter
@@ -320,7 +388,6 @@ let Player = function(game){
     self.y = 60;
     self.visibleWidth = val.default_visible_width;
     self.visibleHeight = val.default_visible_height;
-
 
     //functions
     self.attack = function(){
@@ -426,6 +493,36 @@ let Core = function(game, id){
     return self;
 }
 
+let Tower = function(game, team, type, id){
+    self = new Creature();
+    self.id = id;
+    self.team = team;
+    self.engagemetDst = val.twoer_engage_dst;
+    self.size = val.tower_size;
+    self.toRemove = false;
+    self.target = null;
+    self.attackCount = 0;
+    self.attackRate = val.tower_attack_rate;
+    self.attack = function(angle){
+        new Bullet(self.game, self, angle, 2)
+    }
+    self.update = function(){
+        if(this.self.hp<=0){
+            self.toRemove = true;
+            return;
+        }
+        if(self.target!==null){
+            let tangle = Math.atan2(self.target.y-self.y, self.target.x-self.x)/Math.PI*180;
+            if(self.attackCount >= self.attackRate){
+                self.attack(tangle);
+                self.attackCount = 0;
+            }else{
+                self.attackCount += 1;
+            }
+        }
+    }
+    return self;
+}
 let Team = function(game, id){
     let self = {};
     self.teamId = id;
@@ -454,11 +551,14 @@ let Game = function(id){
     self.SOCKET_LIST = {};
     self.SOCKET_COUNT = 0;
     self.PLAYER_LIST = {};
+    self.PLAYER_GRAY_ZONE_LIST = {};
     self.BOT_LIST = {};
+    self.BOT_TEAMS = {0:{},1:{}};
     self.BOT_COUNT = 0;
     self.BULLET_LIST = {};
     self.BUILDING_COUNT = 0;
     self.BUILDING_LIST = {};
+    self.TOWER_LIST = {};
 
     self.botGenTimeList = [];
     self.TEAM_LIST = {};
@@ -490,7 +590,6 @@ let Game = function(id){
         }else{
             player.team = 1 //y
         }
-        
     }
     self.generateBulletId = function(){
         self.BULLET_COUNT += 1;
@@ -508,26 +607,55 @@ let Game = function(id){
         entity.decreaseHp(damage);
     }
     self.generateBots = function(){
-        for(let i=0; i<5; i++){
-            let bot00 = new Bot(0,val.team_0_bot_path_0.concat());
-            let bot10 = new Bot(1,val.team_0_bot_path_0.concat().reverse());
-            let bot01 = new Bot(0,val.team_0_bot_path_1.concat());
-            let bot11 = new Bot(1,val.team_0_bot_path_1.concat().reverse());
-            let bot02 = new Bot(0,val.team_0_bot_path_2.concat());
-            let bot12 = new Bot(1,val.team_0_bot_path_2.concat().reverse());
-            self.BOT_LIST[this.generateBotId()] = bot00;
-            self.BOT_LIST[this.generateBotId()] = bot01;
-            self.BOT_LIST[this.generateBotId()] = bot02;
-            self.BOT_LIST[this.generateBotId()] = bot10;
-            self.BOT_LIST[this.generateBotId()] = bot11;
-            self.BOT_LIST[this.generateBotId()] = bot12;
+        let maxi = 5;
+        for(let i=0; i<maxi; i++){
+            let bot00 = new Bot(self, 0,val.team_0_bot_path_0.concat(), maxi-i, this.generateBotId());
+            let bot10 = new Bot(self, 1,val.team_0_bot_path_0.concat().reverse(), maxi-i, this.generateBotId());
+            let bot01 = new Bot(self, 0,val.team_0_bot_path_1.concat(), maxi-i, this.generateBotId());
+            let bot11 = new Bot(self, 1,val.team_0_bot_path_1.concat().reverse(), maxi-i, this.generateBotId());
+            let bot02 = new Bot(self, 0,val.team_0_bot_path_2.concat(), maxi-i, this.generateBotId());
+            let bot12 = new Bot(self, 1,val.team_0_bot_path_2.concat().reverse(), maxi-i, this.generateBotId());
+            bot00.y += i*15;
+            bot01.x += i*10;
+            bot01.y += i*10;
+            bot02.x += i*15;
+            bot10.y -= i*15;
+            bot11.x -= i*10;
+            bot11.y -= i*10;
+            bot12.x -= i*15;
+            self.BOT_LIST[bot00.id] = bot00;
+            self.BOT_LIST[bot01.id] = bot01;
+            self.BOT_LIST[bot02.id] = bot02;
+            self.BOT_LIST[bot10.id] = bot10;
+            self.BOT_LIST[bot11.id] = bot11;
+            self.BOT_LIST[bot12.id] = bot12;
+
+            self.BOT_TEAMS[0][bot00.id] = bot00;
+            self.BOT_TEAMS[0][bot01.id] = bot01;
+            self.BOT_TEAMS[0][bot02.id] = bot02;
+            self.BOT_TEAMS[1][bot10.id] = bot10;
+            self.BOT_TEAMS[1][bot11.id] = bot11;
+            self.BOT_TEAMS[1][bot12.id] = bot12;
+            //self.BOT_TEAMS[0].push(bot00);
+            //self.BOT_TEAMS[0].push(bot01);
+            //self.BOT_TEAMS[0].push(bot02);
+            //self.BOT_TEAMS[1].push(bot10);
+            //self.BOT_TEAMS[1].push(bot11);
+            //self.BOT_TEAMS[1].push(bot12);
         }
     } 
     self.updatePlayer = function(){
         let playerData = [];
+        self.PLAYER_GRAY_ZONE_LIST = {};
         for(let i in self.PLAYER_LIST){
             let player = self.PLAYER_LIST[i]; 
             player.update(self.map);
+            let tileId = player.tileX+player.tileY*self.map.numTileHorizontal;
+            if(tileId in self.map.OBJECT_TILE_ARRAY){
+                if(self.map.OBJECT_TILE_ARRAY[tileId].type == "gray_zone"){
+                    self.PLAYER_GRAY_ZONE_LIST[i] = player;
+                }
+            }
             playerData.push({
                 x: player.x,
                 y: player.y,
@@ -574,13 +702,58 @@ let Game = function(id){
         }
         return buildingData;
     }
+    self.updateBotTarget = function(bot){
+        bot.target = null;
+        let opponentTeam = 0;
+        if(bot.team==0){
+            opponentTeam = 1;
+        }
+        //for(let i=0; i<self.BOT_TEAMS[opponentTeam].length; i++){
+        //    if(bot.getDistanceSquared(self.BOT_TEAMS[opponentTeam][i]) < bot.engagemetDst*bot.engagemetDst){
+        //        bot.target = self.BOT_TEAMS[opponentTeam][i];
+        //        return;
+        //    }
+        //}
+        for(let i in self.BOT_TEAMS[opponentTeam]){
+            if(bot.getDistanceSquared(self.BOT_TEAMS[opponentTeam][i]) < bot.engagemetDst*bot.engagemetDst){
+                bot.target = self.BOT_TEAMS[opponentTeam][i];
+                return;
+            }
+        }
+        //for(let i in self.PLAYER_LIST){
+        //    if(self.PLAYER_LIST[i].team != opponentTeam){
+        //        continue;
+        //    }
+        //    if(bot.getDistanceSquared(self.PLAYER_LIST[i])<bot.engagemetDst*bot.engagemetDst){
+        //        bot.target = self.PLAYER_LIST[i];
+        //        return;
+        //    }
+        //}
+        let curClosestDst = 2147483648
+        for(let i in self.PLAYER_LIST){
+            if(self.PLAYER_LIST[i].team != opponentTeam){
+                continue;
+            }else if(i in self.PLAYER_GRAY_ZONE_LIST){
+                continue;
+            }
+            let dstSqr = bot.getDistanceSquared(self.PLAYER_LIST[i])
+            if(bot.getDistanceSquared(self.PLAYER_LIST[i])<bot.engagemetDst*bot.engagemetDst){
+                if(dstSqr < curClosestDst){
+                    bot.target = self.PLAYER_LIST[i];
+                    curClosestDst = dstSqr
+                }
+            }
+        }
+    }
     self.updateBot = function(){
         let botData = [];
         for(let i in self.BOT_LIST){
             let bot = self.BOT_LIST[i];
+            self.updateBotTarget(bot);
             bot.update(self.map);
             if(bot.toRemove){
                 delete self.BOT_LIST[i];
+                delete self.BOT_TEAMS[bot.team][i];
             }else{
                 botData.push({
                     x:bot.x,
@@ -665,6 +838,7 @@ let Game = function(id){
             playerSize: val.player_size,
             val: val,
             buildingList: self.map.buildingList,
+            towerList: self.map.towerList,
         });
         socket.on('disconnect', function(){
             delete self.SOCKET_LIST[socket.id];

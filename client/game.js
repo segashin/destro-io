@@ -118,6 +118,12 @@ var Game = function(){
     self.TileCoords2CanvasCoords = function(x,y){
         return self.getCanvasCoords(x*self.tileSize, y*self.tileSize);
     }
+    self.drawHpBar = function(cx, y, hp, maxHp, barWidth, barHeight){
+        //draw hp bar
+        self.ctx.fillStyle = "#FF0000";
+        self.ctx.fillRect(cx-barWidth/2*self.scale, y, hp/maxHp*barWidth*self.scale, barHeight*self.scale);
+
+    }
     self.drawBot = function(bot){
         let coordXY = self.getCanvasCoords(bot.x, bot.y)
         if(bot.team == 0){
@@ -128,6 +134,7 @@ var Game = function(){
         self.ctx.beginPath();
         self.ctx.arc(coordXY[0], coordXY[1], self.val.bot_size/2*self.scale, 0, 2 * Math.PI);
         self.ctx.fill();
+        self.drawHpBar(coordXY[0], coordXY[1]-(self.val.bot_size/2+3.2)*self.scale, bot.hp, self.val.default_bot_hp, 12, 1.2);
     }
     //pass the absolute position on the game map
     self.drawPlayer = function(player){
@@ -147,7 +154,7 @@ var Game = function(){
         self.ctx.arc(coordXY[0], coordXY[1], self.playerSize/4*self.scale, 0, 2 * Math.PI);
         self.ctx.fill();
         //draw hp bar
-        self.ctx.fillStyle = "#FFAAAA";
+        self.ctx.fillStyle = "#FF0000";
         self.ctx.fillRect(coordXY[0]-10*self.scale, coordXY[1]-(self.playerSize/2+6)*self.scale, player.hp/self.val.default_player_hp*20*self.scale, 2*self.scale)
     };
     //pass the absolute position on the game map
@@ -332,6 +339,7 @@ var Game = function(){
         //x = x/self.widthScale;
         //y = y/self.heightScale;
         var angle = Math.atan2(y,x) / Math.PI * 180;
+        console.log(angle);
         //self.ctx.strokeStyle = "black";
         //self.ctx.beginPath();
         //self.ctx.moveTo(self.canvasMain.width/2, self.canvasMain.height/2);

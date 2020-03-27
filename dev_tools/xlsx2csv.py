@@ -37,6 +37,10 @@ def convert2json(in_fname, out_fname):
                 data["type"] = "water"
                 data["passable"] = True
                 data["shape"] = 0
+            elif val == 4:
+                data["type"] = "gray_zone"
+                data["passable"] = True
+                data["shape"] = 0
             elif val == 11:
                 data["type"] = "wall"
                 data["passable"] = False
